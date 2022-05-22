@@ -1,0 +1,90 @@
+run_multiple_chains.m
+This function runs multiple instances of the code and is currently set up to run on 32 cores via a parfor loop. Each core handles one chain. Each chain is initiated with a rng cluster of the chain number. 
+To change the number of cores being used, change the value of nc, on line 18.
+
+run_matching.m
+This function now runs alt he aspects of the pipeline, e.g. load in data, calculate start temperature, call the function to run tempered sampling, sampling at T==1, then figure generation and data save out. 
+
+import_files.m
+This function allows you to define what tests you want to import for each chain, so that you can run different tests simultaneously within in one multiple run. 
+
+data_import.m 
+Import the data specified for each chain (using the file names define in import_data). Calculate n1 and n2, and swap data if n1>n2. You shouldn't need to change anything in this file as it just takes files from import_files.m. 
+This function also re-scales Y1 and Y2 so that the mean of each point set=(0,0,0) and the minimum cell-cell distance=1.
+
+parameters.m
+There are lots of parameters and data arrays within this pipeline, we have therefore included a .m file to make inputting these a little easier. Change values in this to change the parameters of the MCMC, sampling characteristics, priors etc. 
+
+tempering_data.m
+This function caluclates an appropriate start temperature for the tempering, as well as an appropriate cooling rate based on the initial number of iterations described.
+
+matrix_gen.m 
+Use model parameters to generate three dimensional affine matrix A and affine vector b. 
+
+p_deform.mex (p_deform.m) 
+This function performs the deformation of Y2 via some momenta p. We include the function as a compiled.mex file to improve performance. This function is compiled for a linux system (+a windows version). To compile the original p_deform.m file for your system specs....enter the following at the command line...... 
+codegen p_deform -args {single(0), coder.typeof(single(0),[Inf,1]),single(0),single(0)} 
+Once compiled for your system, you will be able to use the .mex file and significantly improve performance. See sections 2.1 and S1.5for detailed derivation. 
+
+fid_norm_const.m 
+Calculate the fidelity normalisation constant, dependent on the fidelity parameters. 
+
+nlog_log_PP.m
+Calculate the negative log of the posterior predictive 
+
+file_generation.m 
+Generate all of the .txt and .bin files to save out data during sampling. Files are overwritten with no warning. This should be no problem as each file directory is initiated with the date and chain and filenames....however please be careful not to overwrite your data! 
+
+Chainx_log.txt file
+This file saves out all of the progress of the chain (e.g. what temperature it is at or the % of samples completed at T==1). Check in on this file to see how your chain is doing. 
+
+initialise_files.m
+Initialise all of the values for the specified parameters etc. This has been done in its own function to try and make things a little cleaner and to try and keep everything self-contained. This effectively starts the chain randomly (through a random draw in respective priors) within the state space. 
+
+run_tempering.m 
+This function controls the sampling during tempering and the individual modules being sampled on within each global Gibbs iteration (i.e. transformation, fidelity and permutation). 
+
+transformation_sampling.m 
+Perform sampling on the affine transformatio parameters and the non-linear deformation if being included. 
+
+prior_vals_p.m 
+Calculate the negative log of the prior density for momenta
+
+prior_valsa.m 
+Calculate the negative log of the prior density for current affine parameters.
+
+reference_pullback.m 
+Account for the fact we sample on the transformed parameters not the bounded parameters, see section S1.9. 
+
+write_your_data.m
+Writing out data for affine, deformation, fidelity and permutation sampling.
+'a'=transformation, 'f'=fidelity, 'p'=permutation, 'd'=cell to match distances
+This function stops us having to save ALL samples in array during sampling, and stops us having to write out every single iteration. 
+
+trans_t1covariance.m
+Calculate the rolling average of the empirical sample covariance for the transformation (affine and non-linear deformation) parameters. See section S1.10
+
+check_covariance.m 
+Check if covariance is positive semi-definite and symmetric (helps accounts for rounding errors)
+
+fidelity_sampling.m
+Sampling on the fidelity parameters that make up the fidelity matrix. Ony included when data selection is included within problem. 
+
+prior_valsf_beta.m 
+This function calculates the negative log of the betapdf numerator. 
+The denominator of the beta pdf cancels in calculation of acceptance ratio so we have omitted it here to streamline calculation
+
+rndpermutation_sampling.m 
+This function choose two terms within the permutation vector to swap as a new proposal on the permutation vector. 
+
+figure_generation.m 
+Plot figures of data (at end of tempering and at end of sampling at T==1). 
+
+run_sampling_T1.m 
+This function now facilitates sampling on the respective parameters/permutation vector as the run_tempering.m file, but instead with fixed T==1 and a fixed number of iterations N1. 
+
+min_check_nlog_posterior.m 
+This function keeps a track of the avg nlog of the posterior and the minimum value found over the course of sampling (i.e. the deepest point within the state space visited by the chain) 
+
+calc_cell_to_match_dist.m
+Calculate the cell to match distances for the current values of transformation and permutation vector. 
