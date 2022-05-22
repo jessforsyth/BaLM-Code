@@ -1,0 +1,14 @@
+Quick start to run BaLM : 
+
+1. Define how many workers (nc) to intialise in run_multiple_chains.m 
+	This defines how many chains can be run simultaneously (either on the same problem or for different problems)
+	e.g. we run 32 workers, for four problems (8 chains on each problem) for any given run of the code. 
+	
+2. Define what files you want to run for each test (chain), go to import_files.m (see our examples already here). 
+
+3. Change any parameters within the parameters.m file. 
+
+4. Define which modules you want to include (i.e. do you want to include data selection ? and do you want to include the non-linear deformation?) You MUST include the affine transformation and permutation vector sampling. 
+   Do this in the run_matching.m file . 
+   
+   
