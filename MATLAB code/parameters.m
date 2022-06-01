@@ -6,6 +6,7 @@ function [general, beta, prior, samples, arrays,saving, tempering,data]=paramete
 %       parameter_x == ....
 %       ...and so on 
 % end
+data.n_refpoints=0;                  %change this for how many ref points you have (these must be at end of Y1 and Y2) 
 
 general=[];
 general.N=7e6;                       %minimum number of tempered iterations
